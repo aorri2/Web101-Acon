@@ -87,4 +87,28 @@ public class TodoController {
         //4. ResponseDTO를 리턴한다.
         return ResponseEntity.ok().body(response);
     }
+
+    @PutMapping
+    public ResponseEntity<?> updateTodo(@RequestBody TodoDTO dto){
+        String temporaryUserId = "temporary-user"; // temporary user Id.
+
+        //1. dto를 entity로 변환한다.
+        TodoEntity entity = TodoDTO.toEntity(dto);
+
+        //2. UserId를 temporaryUserId로 초기화한다. 여기는 4장 인증과 인가에서 수정할 예정.
+        entity.setUserId(temporaryUserId);
+
+        //3. 서비스를 이용해 entity를 업데이트 한다.
+        List<TodoEntity> entites = service.update(entity);
+
+        //4. 자바 스트림을 이용해 리턴된 엔티티 리스트를 TodoDTO 리스트로 변환한다.
+        List<TodoDTO> dtos = entites.stream().map(TodoDTO::new).collect(Collectors.toList());
+
+        // 변환된 TodoDTO 리스트를 이용해 ResponseDTO를 초기화한다.
+        ResponseDTO<TodoDTO> response = ResponseDTO.<TodoDTO>builder().data(dtos).build();
+
+        //ResponseDTO를 리턴한다.
+        return ResponseEntity.ok().body(response);
+
+    }
 }
